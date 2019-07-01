@@ -1,5 +1,6 @@
 package com.example.reversequestions;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -10,15 +11,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    private ArrayList<Score> mDataset = new ArrayList<>();
+    private ArrayList<Score> mDataset = new ArrayList<Score>();
+    private Context ctx;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
+
         public TextView name;
         public TextView score;
         public ImageView avatar;
@@ -34,8 +38,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(ArrayList<Score>  myDataset) {
-        mDataset = myDataset;
+    public MyAdapter(Context ctx, ArrayList<Score>  myDataset) {
+        this.ctx = ctx;
+        this.mDataset = myDataset;
     }
 
     // Create new views (invoked by the layout manager)

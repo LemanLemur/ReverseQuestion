@@ -22,6 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initRecycler();
         navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -71,15 +73,29 @@ public class MainActivity extends AppCompatActivity {
         but1 = (ImageButton) findViewById(R.id.imageButton);
         but2 = (ImageButton) findViewById(R.id.imageButton2);
 
-        scoreList.setVisibility(View.GONE);
-
         but1.setEnabled(true);
         but2.setEnabled(true);
+
+        ScoreList.scoreList.add(new Score("ileo", 0));
+        ScoreList.scoreList.add(new Score("ileo1", 3));
+        ScoreList.scoreList.add(new Score("ileo2", 1));
+
+        initRecycler();
+        scoreList.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initRecycler();
+        scoreList.setVisibility(View.GONE);
     }
 
     private void initRecycler(){
         scoreList = (RecyclerView) findViewById(R.id.scoreList);
-        MyAdapter adapter = new MyAdapter(ScoreList.scoreList);
+        Collections.sort(ScoreList.scoreList);
+        Collections.reverse(ScoreList.scoreList);
+        MyAdapter adapter = new MyAdapter(getApplicationContext(), ScoreList.scoreList);
         scoreList.setAdapter(adapter);
         scoreList.setLayoutManager(new LinearLayoutManager(this));
     }

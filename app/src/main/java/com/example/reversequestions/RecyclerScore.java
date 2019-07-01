@@ -25,7 +25,7 @@ public class RecyclerScore extends Activity {
         recyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new MyAdapter(ScoreList.scoreList);
+        mAdapter = new MyAdapter(getApplicationContext(), ScoreList.scoreList);
         recyclerView.setAdapter(mAdapter);
     }
 

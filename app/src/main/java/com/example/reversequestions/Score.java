@@ -1,6 +1,6 @@
 package com.example.reversequestions;
 
-public class Score {
+public class Score implements Comparable{
     private String name;
     private int score;
     private int time;
@@ -8,6 +8,17 @@ public class Score {
     public Score(String name, int score) {
         this.name = name;
         this.score = score;
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "Score{" +
+                "name='" + name + '\'' +
+                ", score=" + score +
+                ", time=" + time +
+                '}';
     }
 
     public String getName() {
@@ -32,5 +43,12 @@ public class Score {
 
     public void setTime(int time) {
         this.time = time;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        int score=((Score)o).getScore();
+        /* For Ascending order*/
+        return this.score-score;
     }
 }
