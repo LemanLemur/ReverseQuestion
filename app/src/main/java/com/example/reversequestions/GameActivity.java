@@ -2,6 +2,7 @@ package com.example.reversequestions;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -45,6 +46,7 @@ public class GameActivity extends Activity {
     private QuestBase questBase = new QuestBase();
     private int r;
     private int reverse;
+    private MediaPlayer goodSound, wrongSound, tictacSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,10 @@ public class GameActivity extends Activity {
         pytanie.setVisibility(View.GONE);
         odpowiedzi.setVisibility(View.GONE);
 
+        goodSound = MediaPlayer.create(this, R.raw.correct);
+        wrongSound = MediaPlayer.create(this, R.raw.wrong);
+        tictacSound = MediaPlayer.create(this, R.raw.tictac);
+
         questCount.setText(result+wynik);
         getNewQuestion();
 //        startStoper();
@@ -88,6 +94,7 @@ public class GameActivity extends Activity {
                     System.out.println("\n\nGood ans in clock: "+goodAns+"\n\n");
                 }
                 if((SystemClock.elapsedRealtime() - chronometer.getBase()) >= 4000){
+                        tictacSound.start();
                         resetStoper();
                         gameOver();
                 }
@@ -104,10 +111,12 @@ public class GameActivity extends Activity {
         currentQuest++;
         resetStoper();
         if(goodAns == 0){
+            goodSound.start();
             wynik++;
                 showScore("Brawo!");
             Toast.makeText(getApplicationContext(), "Dobra odpowiedź", Toast.LENGTH_SHORT).show();
         }else{
+            wrongSound.start();
             gameOver();
             Toast.makeText(getApplicationContext(), "Zła odpowiedź", Toast.LENGTH_SHORT).show();
         }
@@ -117,10 +126,12 @@ public class GameActivity extends Activity {
         currentQuest++;
         resetStoper();
         if(goodAns == 1){
+            goodSound.start();
             wynik++;
                 showScore("Brawo!");
             Toast.makeText(getApplicationContext(), "Dobra odpowiedź", Toast.LENGTH_SHORT).show();
         }else{
+            wrongSound.start();
             gameOver();
             Toast.makeText(getApplicationContext(), "Zła odpowiedź", Toast.LENGTH_SHORT).show();
         }
