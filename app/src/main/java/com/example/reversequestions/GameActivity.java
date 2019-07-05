@@ -47,11 +47,14 @@ public class GameActivity extends Activity {
     private int r;
     private int reverse;
     private MediaPlayer goodSound, wrongSound, tictacSound;
+    private ScoreDB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_activity);
+
+        db = new ScoreDB(this);
 
         pytanie = (ConstraintLayout) findViewById(R.id.pyt1);
         odpowiedzi = (ConstraintLayout) findViewById(R.id.pyt2);
@@ -112,6 +115,7 @@ public class GameActivity extends Activity {
         resetStoper();
         if(goodAns == 0){
             goodSound.start();
+            ProfileTmp.currentExp++;
             wynik++;
                 showScore("Brawo!");
             Toast.makeText(getApplicationContext(), "Dobra odpowiedź", Toast.LENGTH_SHORT).show();
@@ -127,6 +131,7 @@ public class GameActivity extends Activity {
         resetStoper();
         if(goodAns == 1){
             goodSound.start();
+            ProfileTmp.currentExp++;
             wynik++;
                 showScore("Brawo!");
             Toast.makeText(getApplicationContext(), "Dobra odpowiedź", Toast.LENGTH_SHORT).show();
@@ -147,6 +152,7 @@ public class GameActivity extends Activity {
         odpowiedz1.setEnabled(false);
         odpowiedz2.setEnabled(false);
         ScoreList.scoreList.add(new Score(ProfileTmp.name, wynik));
+        db.insertData(ProfileTmp.name, wynik, ProfileTmp.avatar);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
 
