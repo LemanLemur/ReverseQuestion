@@ -16,10 +16,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,8 +46,11 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton but2;
     private ConstraintLayout conScoreList;
     private ScoreDB db;
+    private ProfileDB dbP;
     private ProgressBar progressLvl;
     private int lvl, exp, nextExp;
+    private Spinner spinner;
+    private ArrayList<Profile> profileList = new ArrayList<>();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -84,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         db = new ScoreDB(this);
+        dbP = new ProfileDB(this);
         getScoreTable();
 
         conScoreList = (ConstraintLayout) findViewById(R.id.conScoreList);
@@ -96,16 +103,60 @@ public class MainActivity extends AppCompatActivity {
         textLvl = (TextView) findViewById(R.id.profileLvlName);
         textExp = (TextView) findViewById(R.id.profileLvl);
         textName = (TextView) findViewById(R.id.profileName);
+        spinner = (Spinner) findViewById(R.id.spinner);
 
         profile.setVisibility(View.GONE);
 
         but1.setEnabled(true);
         but2.setEnabled(true);
 
-        //TODO wczytywanie danych z bazy do profileTmp
-        lvl = ProfileTmp.lvl;
-        exp = ProfileTmp.currentExp;
-        nextExp = ProfileTmp.nextExp;
+        Cursor resP = dbP.getAllData();
+        if(resP.moveToNext()) {
+            ProfileTmp.id = resP.getString(0);
+            ProfileTmp.name = resP.getString(1);
+            ProfileTmp.lvl = Integer.parseInt(resP.getString(2));
+            ProfileTmp.currentExp = Integer.parseInt(resP.getString(3));
+            ProfileTmp.avatar = Integer.parseInt(resP.getString(4));
+            profileList.add(new Profile(ProfileTmp.name, ProfileTmp.id, ProfileTmp.lvl, ProfileTmp.currentExp, ProfileTmp.avatar));
+            lvl = ProfileTmp.lvl;
+            exp = ProfileTmp.currentExp;
+            nextExp = 100 + lvl * 2 * 100;
+            ProfileTmp.nextExp = nextExp;
+        }
+
+        while(resP.moveToNext()){
+            profileList.add(new Profile(
+                    resP.getString(1),
+                    resP.getString(0),
+                    Integer.parseInt(resP.getString(2)),
+                    Integer.parseInt(resP.getString(3)),
+                    Integer.parseInt(resP.getString(4))));
+        }
+
+        if(ProfileTmp.name.length()<1){
+            createProfile();
+        }
+
+        ArrayAdapter<Profile> adapter = new ArrayAdapter<Profile>(this, android.R.layout.simple_spinner_dropdown_item, profileList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Profile profile = (Profile) parent.getSelectedItem();
+                ProfileTmp.id = profile.getId();
+                ProfileTmp.name = profile.getName();
+                ProfileTmp.lvl = profile.getLvl();
+                ProfileTmp.currentExp = profile.getExp();
+                ProfileTmp.avatar = profile.getAvatar();
+                prepareProfile();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         initRecycler();
         conScoreList.setVisibility(View.GONE);
@@ -116,6 +167,18 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         initRecycler();
         conScoreList.setVisibility(View.GONE);
+
+        Cursor resP = dbP.getAllData();
+        profileList.removeAll(profileList);
+        while(resP.moveToNext()){
+            profileList.add(new Profile(
+                    resP.getString(1),
+                    resP.getString(0),
+                    Integer.parseInt(resP.getString(2)),
+                    Integer.parseInt(resP.getString(3)),
+                    Integer.parseInt(resP.getString(4))));
+        }
+        prepareProfile();
     }
 
     private void initRecycler() {
@@ -129,6 +192,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void start(View view) {
         startActivity(new Intent(this, GameActivity.class));
+    }
+
+    public void createProfile(){
+        startActivity(new Intent(this, CreateProfile.class));
+    }
+
+    public void createProfileClick(View view){
+        if(profileList.size()<5) {
+            startActivity(new Intent(this, CreateProfile.class));
+        }else {
+            Toast.makeText(getApplicationContext(), "Posiadasz za dużo profili!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void scoreTable(View view) {
@@ -159,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
             ProfileTmp.currentExp = exp;
             ProfileTmp.nextExp = nextExp;
             ProfileTmp.lvl = lvl;
+            dbP.updateData(ProfileTmp.id, ProfileTmp.name, ProfileTmp.lvl, ProfileTmp.currentExp, ProfileTmp.avatar);
         }
 
         textLvl.setText("LVL: " + lvl);
@@ -168,6 +244,27 @@ public class MainActivity extends AppCompatActivity {
         progressLvl.setProgress(progress);
         textName.setText(ProfileTmp.name);
     }
+
+    public void deleteProfile(View view){
+        dbP.deleteData(ProfileTmp.id);
+        Cursor resP = dbP.getAllData();
+        if(resP.moveToNext()) {
+            ProfileTmp.id = resP.getString(0);
+            ProfileTmp.name = resP.getString(1);
+            ProfileTmp.lvl = Integer.parseInt(resP.getString(2));
+            ProfileTmp.currentExp = Integer.parseInt(resP.getString(3));
+            ProfileTmp.avatar = Integer.parseInt(resP.getString(4));
+            profileList.add(new Profile(ProfileTmp.name, ProfileTmp.id, ProfileTmp.lvl, ProfileTmp.currentExp, ProfileTmp.avatar));
+            lvl = ProfileTmp.lvl;
+            exp = ProfileTmp.currentExp;
+            nextExp = 100 + lvl * 2 * 100;
+            ProfileTmp.nextExp = nextExp;
+        }else {
+            createProfile();
+        }
+        prepareProfile();
+    }
+
 }
 
 

@@ -30,7 +30,6 @@ public class GameActivity extends Activity {
     private Chronometer stoper;
     private ConstraintLayout pytanie;
     private ConstraintLayout odpowiedzi;
-    private ConstraintLayout character;
     private Button odpowiedz1;
     private Button odpowiedz2;
     private TextView question;
@@ -48,6 +47,7 @@ public class GameActivity extends Activity {
     private int reverse;
     private MediaPlayer goodSound, wrongSound, tictacSound;
     private ScoreDB db;
+    private ProfileDB dbP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +55,7 @@ public class GameActivity extends Activity {
         setContentView(R.layout.game_activity);
 
         db = new ScoreDB(this);
+        dbP = new ProfileDB(this);
 
         pytanie = (ConstraintLayout) findViewById(R.id.pyt1);
         odpowiedzi = (ConstraintLayout) findViewById(R.id.pyt2);
@@ -64,7 +65,6 @@ public class GameActivity extends Activity {
         question = (TextView) findViewById(R.id.pytanie);
         questCount = (TextView) findViewById(R.id.questCount);
         name = (EditText) findViewById(R.id.editText);
-        character = (ConstraintLayout) findViewById(R.id.con3);
 
         stoper = (Chronometer) findViewById(R.id.stoper);
         stoper.setFormat("%s");
@@ -79,6 +79,7 @@ public class GameActivity extends Activity {
 
         questCount.setText(result+wynik);
         getNewQuestion();
+        startQuest();
 //        startStoper();
     }
 
@@ -116,6 +117,7 @@ public class GameActivity extends Activity {
         if(goodAns == 0){
             goodSound.start();
             ProfileTmp.currentExp++;
+            dbP.updateData(ProfileTmp.id, ProfileTmp.name, ProfileTmp.lvl, ProfileTmp.currentExp, ProfileTmp.avatar);
             wynik++;
                 showScore("Brawo!");
             Toast.makeText(getApplicationContext(), "Dobra odpowiedź", Toast.LENGTH_SHORT).show();
@@ -132,6 +134,7 @@ public class GameActivity extends Activity {
         if(goodAns == 1){
             goodSound.start();
             ProfileTmp.currentExp++;
+            dbP.updateData(ProfileTmp.id, ProfileTmp.name, ProfileTmp.lvl, ProfileTmp.currentExp, ProfileTmp.avatar);
             wynik++;
                 showScore("Brawo!");
             Toast.makeText(getApplicationContext(), "Dobra odpowiedź", Toast.LENGTH_SHORT).show();
@@ -205,18 +208,11 @@ public class GameActivity extends Activity {
         System.out.println("\n\nGood ans after if: "+goodAns+"\n\n");
     }
 
-    public void startQuest(View view){
-        if(name.getText().length()>0){
+    public void startQuest(){
             pytanie.setVisibility(View.VISIBLE);
             odpowiedzi.setVisibility(View.VISIBLE);
             stoper.setVisibility(View.VISIBLE);
-            character.setVisibility(View.GONE);
-            ProfileTmp.setName(String.valueOf(name.getText()));
             startStoper();
-        }else{
-            Toast.makeText(getApplicationContext(), "Imię nie może być puste!", Toast.LENGTH_SHORT).show();
-        }
-
     }
 
 }
