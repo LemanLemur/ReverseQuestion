@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "265501701955",
+    "firebase_url": "https://reverse-question.firebaseio.com",
+    "project_id": "reverse-question",
+    "storage_bucket": "reverse-question.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:265501701955:android:54e00e53843cecbe",
+        "android_client_info": {
+          "package_name": "com.example.reversequestions"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "265501701955-vvjuiq98sghqp083oplu6bk7u38le73o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5FOjeguZ3EeY6NX1nSX0NghsF_mgZVSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "265501701955-vvjuiq98sghqp083oplu6bk7u38le73o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

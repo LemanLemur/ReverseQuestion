@@ -1,38 +1,42 @@
 package com.example.reversequestions;
 
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class MainActivity extends AppCompatActivity {
 
+    private AdView mAdView;
     private ConstraintLayout profile;
     private ConstraintLayout home;
     private TextView homeText;
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
+                    mAdView.setVisibility(View.VISIBLE);
                     home.setVisibility(View.VISIBLE);
                     homeText.setVisibility(View.VISIBLE);
                     conScoreList.setVisibility(View.GONE);
@@ -66,12 +71,14 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_dashboard:
                     prepareProfile();
+                    mAdView.setVisibility(View.GONE);
                     home.setVisibility(View.GONE);
                     homeText.setVisibility(View.GONE);
                     conScoreList.setVisibility(View.GONE);
                     profile.setVisibility(View.VISIBLE);
                     return true;
                 case R.id.navigation_notifications:
+                    mAdView.setVisibility(View.VISIBLE);
                     home.setVisibility(View.GONE);
                     homeText.setVisibility(View.GONE);
                     conScoreList.setVisibility(View.VISIBLE);
@@ -160,11 +167,31 @@ public class MainActivity extends AppCompatActivity {
 
         initRecycler();
         conScoreList.setVisibility(View.GONE);
+
+        MobileAds.initialize(this,
+                "ca-app-pub-3443485931200995~4334429354");
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+//        mInterstitialAd = new InterstitialAd(this);
+//        mInterstitialAd.setAdUnitId("ca-app-pub-3443485931200995/4470160729");
+//        mInterstitialAd.loadAd(new AdRequest.Builder()
+//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+//                .addTestDevice("INSERT_YOUR_TEST_DEVICE_ID_HERE")
+//                .build());
+//        if (mInterstitialAd.isLoaded()) {
+//            mInterstitialAd.show();
+//        }
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         initRecycler();
         conScoreList.setVisibility(View.GONE);
 
@@ -263,6 +290,27 @@ public class MainActivity extends AppCompatActivity {
             createProfile();
         }
         prepareProfile();
+    }
+
+    private void addAds() {
+        // add AdMob
+        AdView adView = new AdView(this);
+        adView.setAdUnitId("ca-app-pub-3443485931200995/4470160729");
+        adView.setAdSize(AdSize.SMART_BANNER);
+
+        LinearLayout.LayoutParams adLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        adView.setLayoutParams(adLayoutParams);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.addView(adView);
+        layout.setGravity(Gravity.BOTTOM);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        addContentView(layout, layoutParams);
+
+        // load ad
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
     }
 
 }

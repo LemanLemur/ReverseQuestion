@@ -2,29 +2,35 @@ package com.example.reversequestions;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AlertDialog;
-import android.view.MenuItem;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AlertDialog;
+
 import android.view.View;
-import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+
 import java.util.Random;
 
 public class GameActivity extends Activity {
 
 
     AlertDialog alert;
+
+    private AdView mAdView;
+    private InterstitialAd mInterstitialAd;
 
     private TextView mTextMessage;
     private Chronometer stoper;
@@ -80,6 +86,13 @@ public class GameActivity extends Activity {
         questCount.setText(result+wynik);
         getNewQuestion();
         startQuest();
+
+        MobileAds.initialize(this,
+                "ca-app-pub-3443485931200995~4334429354");
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 //        startStoper();
     }
 
@@ -154,8 +167,10 @@ public class GameActivity extends Activity {
     public void gameOver() {
         odpowiedz1.setEnabled(false);
         odpowiedz2.setEnabled(false);
-        ScoreList.scoreList.add(new Score(ProfileTmp.name, wynik));
-        db.insertData(ProfileTmp.name, wynik, ProfileTmp.avatar);
+        if(wynik>0) {
+            ScoreList.scoreList.add(new Score(ProfileTmp.name, wynik));
+            db.insertData(ProfileTmp.name, wynik, ProfileTmp.avatar);
+        }
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
 
@@ -170,6 +185,7 @@ public class GameActivity extends Activity {
                     public void onClick(DialogInterface dialog, int id) {
                         // if this button is clicked, close
                         // current activity
+                        afterGame();
                         GameActivity.this.finish();
                     }
                 });
@@ -213,6 +229,10 @@ public class GameActivity extends Activity {
             odpowiedzi.setVisibility(View.VISIBLE);
             stoper.setVisibility(View.VISIBLE);
             startStoper();
+    }
+
+    public void afterGame(){
+        startActivity(new Intent(getApplicationContext(), AfterGame.class));
     }
 
 }
